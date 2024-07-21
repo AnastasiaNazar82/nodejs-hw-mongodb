@@ -11,6 +11,7 @@ export const createContactServies = (payload) =>
 export const deleteContactServies = (contactId) =>
   ContactsCollection.findByIdAndDelete(contactId);
 
+// використоауємо для put та patch у контролері
 export const updateContactServies = async (contactId, payload, option = {}) => {
   const result = await ContactsCollection.findByIdAndUpdate(
     { _id: contactId },
@@ -29,9 +30,3 @@ export const updateContactServies = async (contactId, payload, option = {}) => {
     isNew: Boolean(result?.lastErrorObject?.upserted),
   };
 };
-
-// export const updateContactServies = (contactId, contact) =>
-//   ContactsCollection.findByIdAndUpdate(contactId, contact, { new: true });
-
-// export const patchContactServies = (contactId, contact) =>
-//   ContactsCollection.findByIdAndUpdate(contactId, contact, { new: true });
