@@ -61,7 +61,7 @@ export const updateContactController = async (req, res, next) => {
     upsert: true,
   });
 
-  if (!resultContact || !resultContact.value) {
+  if (!resultContact) {
     next(createHttpError(404, 'Contact not found!'));
     return;
   }
