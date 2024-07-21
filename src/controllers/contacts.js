@@ -1,3 +1,4 @@
+import createHttpError from 'http-errors';
 import { getAllContactsServies, getContactById } from '../services/contacts.js';
 
 export const getAllContactsController = async (req, res, next) => {
@@ -16,7 +17,7 @@ export const getContactByIdController = async (req, res, next) => {
 
   // якщо не знайдено контакт
   if (!contact) {
-    next(new Error('Sorry, we don`t have find a contact!'));
+    next(createHttpError(404, 'Sorry, we don`t have find a contact!'));
     return;
   }
   // якщо знайдено контакт
