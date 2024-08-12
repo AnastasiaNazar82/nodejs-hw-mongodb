@@ -22,8 +22,6 @@ router.use(authenticate);
 
 router.get('/', ctrlWrapper(getAllContactsController));
 
-router.get('/', ctrlWrapper(getAllContactsController));
-
 router.get('/:contactId', validateId, ctrlWrapper(getContactByIdController));
 
 router.post(

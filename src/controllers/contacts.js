@@ -21,6 +21,7 @@ export const getAllContactsController = async (req, res, next) => {
     sortBy,
     sortOrder,
     filter,
+    userId: req.user._id,
   });
 
   res.status(200).json({
@@ -32,7 +33,7 @@ export const getAllContactsController = async (req, res, next) => {
 
 export const getContactByIdController = async (req, res, next) => {
   const { contactId } = req.params;
-  const contact = await getContactById(contactId);
+  const contact = await getContactById(contactId, req.user._id);
 
   // якщо не знайдено контакт
   if (!contact) {
@@ -48,7 +49,7 @@ export const getContactByIdController = async (req, res, next) => {
 };
 
 export const createContactController = async (req, res) => {
-  const newContact = await createContactServies(req.body);
+  const newContact = await createContactServies(req.body, req.user._id);
 
   res.status(201).json({
     status: 201,
@@ -59,7 +60,7 @@ export const createContactController = async (req, res) => {
 
 export const deleteContactController = async (req, res, next) => {
   const { contactId } = req.params;
-  const removedContact = await deleteContactServies(contactId);
+  const removedContact = await deleteContactServies(contactId, req.user._id);
 
   if (!removedContact) {
     next(createHttpError(404, 'Contact not found!'));
@@ -70,9 +71,14 @@ export const deleteContactController = async (req, res, next) => {
 
 export const updateContactController = async (req, res, next) => {
   const { contactId } = req.params;
-  const resultContact = await updateContactServies(contactId, req.body, {
-    upsert: true,
-  });
+  const resultContact = await updateContactServies(
+    contactId,
+    req.body,
+    req.user._id,
+    {
+      upsert: true,
+    },
+  );
 
   if (!resultContact) {
     next(createHttpError(404, 'Contact not found!'));
@@ -88,7 +94,7 @@ export const updateContactController = async (req, res, next) => {
 
 export const patchContactController = async (req, res, next) => {
   const { contactId } = req.params;
-  const result = await updateContactServies(contactId, req.body);
+  const result = await updateContactServies(contactId, req.body, req.user._id);
 
   if (!result) {
     next(createHttpError(404, 'Contact not found!'));
