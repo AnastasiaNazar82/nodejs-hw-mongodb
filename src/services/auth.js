@@ -6,16 +6,16 @@ import { SessionsCollection } from '../db/models/Session.js';
 import { FIFTEEN_MINUTES, ONE_MONTH } from '../constants/index.js';
 
 // ============================================
-export const registerUser = async (payload) => {
-  const user = await UsersCollection.findOne({ email: payload.email });
+export const registerUser = async (user) => {
+  const userEmail = await UsersCollection.findOne({ email: user.email });
 
-  if (user) {
+  if (userEmail !== null) {
     throw createHttpError(409, 'Email in use');
   }
 
-  const encryptedPassword = await bcrypt.hash(payload.password, 10);
+  const encryptedPassword = await bcrypt.hash(user.password, 10);
   return await UsersCollection.create({
-    ...payload,
+    ...user,
     password: encryptedPassword,
   });
 };
@@ -84,7 +84,7 @@ export const refreshUserSession = async ({ sessionId, refreshToken }) => {
   }
 
   const newSession = createSession();
-  await SessionsCollection.deleteOne({ sessionId, refreshToken });
+  await SessionsCollection.deleteOne({ _id: sessionId, refreshToken });
 
   return await SessionsCollection.create({
     userId: session.userId,

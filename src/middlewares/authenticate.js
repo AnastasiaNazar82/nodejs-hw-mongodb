@@ -13,8 +13,13 @@ export const authenticate = async (req, res, next) => {
   const bearer = authHeader.split(' ')[0];
   const token = authHeader.split(' ')[1];
 
-  if (bearer !== 'Bearer' || !token) {
+  if (bearer !== 'Bearer') {
     next(createHttpError(401, 'Auth header should be of type Bearer'));
+    return;
+  }
+
+  if (!token) {
+    next(createHttpError(401, 'Token not mentioned'));
     return;
   }
 

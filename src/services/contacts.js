@@ -22,14 +22,15 @@ export const getAllContactsServies = async ({
     contactsQuery.where('isFavourite').equals(filter.isFavourite);
   }
 
-  const [contactsCount, contacts] = await Promise.all([
-    ContactsCollection.find({ userId }).merge(contactsQuery).countDocuments(),
-    contactsQuery
-      .skip(skip)
-      .limit(limit)
-      .sort({ [sortBy]: sortOrder })
-      .exec(),
-  ]);
+  const contactsCount = await ContactsCollection.find({ userId })
+    .merge(contactsQuery)
+    .countDocuments();
+
+  const contacts = await contactsQuery
+    .skip(skip)
+    .limit(limit)
+    .sort({ [sortBy]: sortOrder })
+    .exec();
 
   const paginationData = calculatePaginationData(contactsCount, perPage, page);
 
@@ -39,21 +40,30 @@ export const getAllContactsServies = async ({
   };
 };
 
-export const getContactById = (contactId, userId) =>
-  ContactsCollection.findOne({ _id: contactId, userId: userId });
+export const getContactById = async (contactId, userId) => {
+  const contact = await ContactsCollection.findOne({ _id: contactId, userId });
+  return contact;
+};
 
-export const createContactServies = (payload, userId) =>
-  ContactsCollection.create({ ...payload, userId });
+export const createContactServies = async (payload) => {
+  const contact = await ContactsCollection.create(payload);
+  return contact;
+};
 
-export const deleteContactServies = (contactId, userId) =>
-  ContactsCollection.findOneAndDelete({ _id: contactId, userId: userId });
+export const deleteContactServies = async (contactId, userId) => {
+  const contact = await ContactsCollection.findOneAndDelete({
+    _id: contactId,
+    userId,
+  });
+  return contact;
+};
 
 // використоауємо для put та patch у контролері
 export const updateContactServies = async (
   contactId,
+  userId,
   payload,
-  option,
-  userId = {},
+  option = {},
 ) => {
   const result = await ContactsCollection.findOneAndUpdate(
     { _id: contactId, userId },
