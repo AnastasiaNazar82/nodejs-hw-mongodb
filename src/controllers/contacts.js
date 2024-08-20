@@ -18,10 +18,9 @@ export const getAllContactsController = async (req, res) => {
   const { page, perPage } = parsePaginationParams(req.query);
   const { sortBy, sortOrder } = parseSortParams(req.query);
   const filter = parseFilterParams(req.query);
-  const userId = req.user._id;
 
   const contacts = await getAllContactsServies({
-    userId,
+    userId: req.user._id,
     page,
     perPage,
     sortBy,
@@ -39,6 +38,7 @@ export const getAllContactsController = async (req, res) => {
 // =======================================================
 export const getContactByIdController = async (req, res) => {
   const { contactId } = req.params;
+  console.log(contactId);
   const contact = await getContactById(contactId, req.user._id);
 
   // якщо не знайдено контакт
@@ -93,22 +93,33 @@ export const deleteContactController = async (req, res, next) => {
 };
 
 // =======================================================
-export const updateContactController = async (req, res, next) => {
+export const updateContactController = async (req, res) => {
   const { contactId } = req.params;
   const userId = req.user._id;
+
+  const photo = req.file;
+
+  let photoUrl;
+
+  if (photo) {
+    if (env('ENABLE_CLOUDINARY') === 'true') {
+      photoUrl = await saveFileToCloudinary(photo);
+    } else {
+      photoUrl = await saveFileToUploadDir(photo);
+    }
+  }
 
   const resultContact = await updateContactServies(
     contactId,
     userId,
-    req.body,
+    { ...req.body, photo: photoUrl },
     {
       upsert: true,
     },
   );
 
   if (!resultContact) {
-    next(createHttpError(404, 'Contact not found!'));
-    return;
+    throw createHttpError(404, 'Contact not found!');
   }
   const status = resultContact.isNew ? 201 : 200;
   res.status(status).json({
