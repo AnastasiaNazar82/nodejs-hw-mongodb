@@ -15,6 +15,7 @@ import { saveFileToCloudinary } from '../utils/saveFileToCloudinary.js';
 
 // =======================================================
 export const getAllContactsController = async (req, res) => {
+  // console.log(req.user);
   const { page, perPage } = parsePaginationParams(req.query);
   const { sortBy, sortOrder } = parseSortParams(req.query);
   const filter = parseFilterParams(req.query);
@@ -66,10 +67,12 @@ export const createContactController = async (req, res) => {
       photoUrl = await saveFileToUploadDir(photo);
     }
   }
-  const contact = await createContactServies(
-    { ...req.body, photo: photoUrl },
-    req.user._id,
-  );
+  // console.log(photoUrl);
+  const contact = await createContactServies({
+    ...req.body,
+    userId: req.user._id,
+    photo: photoUrl,
+  });
 
   res.status(201).json({
     status: 201,
@@ -147,7 +150,7 @@ export const patchContactController = async (req, res, next) => {
     }
   }
 
-  const result = await updateContactServies(contactId, {
+  const result = await updateContactServies(contactId, req.user._id, {
     ...req.body,
     photo: photoUrl,
   });
