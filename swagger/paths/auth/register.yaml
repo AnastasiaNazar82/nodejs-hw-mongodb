@@ -1,0 +1,56 @@
+tags:
+  - Auth
+summary: Register a user
+operationId: registerUser
+description: 'Create a new user with payload'
+security: []
+requestBody:
+  content:
+    application/json:
+      schema:
+        type: object
+        required:
+          - name
+          - email
+          - password
+        properties:
+          name:
+            description: "User's name"
+            type: string
+            format: email
+            example: 'Anna Kirk'
+          email:
+            description: "User's email"
+            type: string
+            example: 'test@gmail.com'
+          password:
+            description: "User's password"
+            type: string
+            example: '123456789'
+responses:
+  '201':
+    description: Create a user
+    content:
+      application/json:
+        schema:
+          type: object
+          required:
+            - status
+            - message
+            - data
+          properties:
+            status:
+              type: integer
+              example: 201
+            message:
+              type: string
+              example: Successfully registered a user!
+            data:
+              type: object
+              $ref: '../../components/schemas/user.yaml'
+  '401':
+    $ref: '../../components/responses/401.yaml'
+  '409':
+    $ref: '../../components/responses/409.yaml'
+  '500':
+    $ref: '../../components/responses/500.yaml'
